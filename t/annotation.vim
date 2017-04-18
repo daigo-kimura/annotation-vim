@@ -79,4 +79,24 @@ describe 'Annotation'
       normal! uuu
     endfor
   end
+
+  it 'annotate several-lines-sentence surronded by(><)'
+    for i in range(0, 7)
+      execute 'normal!' 'i' . join([
+      \   '初めまして。こんにちは>今日は',
+      \   'いい天気ですね<',
+      \ ], "\<Return>")
+
+      normal! 0
+      execute 'normal' i . 'l'
+      call MyAnnotation()
+
+      Expect getline(1) ==#
+      \   '初めまして。こんにちは><opinion tag="graphic:p,">今日は'
+      Expect getline(2) ==#
+      \   'いい天気ですね</opinion><'
+
+      normal! uuu
+    endfor
+  end
 end

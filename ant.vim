@@ -64,9 +64,6 @@ function! MyAnnotation()
   let l:line = ant#split_multibyte(getline("."))
   let l:cursor_pos = getpos('.')
 
-  let l:before_char = l:line[0: ant#get_current_col() - 2]
-  let l:before_char_len = len(l:before_char)
-  let l:after_char = l:line[ant#get_current_col() - 1: ]
   " この記号を含んで囲む
   let l:punctuations = ['。', '！',]
   " この記号を含まず囲む
@@ -79,7 +76,7 @@ function! MyAnnotation()
   let l:prev_cursor_col = l:search_col + 1
 
   if s:show_log
-    echo "Search previous char: "
+    echo "Search preceeding char: "
     echo l:search_line
     echo 'row: ' . l:search_row
     echo 'col: ' . l:search_col
@@ -144,7 +141,7 @@ function! MyAnnotation()
   let l:search_row = l:cursor_pos[1]
 
   if s:show_log
-    echo "Search previous char: "
+    echo "Search following char: "
     let l:output = []
     for l:i in range(1, len(l:search_line))
       call add(l:output, l:i . ': ' . l:search_line[l:i - 1])
