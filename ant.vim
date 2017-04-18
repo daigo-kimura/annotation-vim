@@ -6,6 +6,7 @@ let s:begin_tag = '<opinion tag="graphic:p,">'
 let s:end_tag   = '</opinion>'
 let s:show_log  = 0
 
+
 function! ant#is_multibyte(code)
   if a:code < 128
     return 0
@@ -59,7 +60,6 @@ function! ant#contain_str(list, char)
 endfunction
 
 
-" TODO: 複数行に渡って書かれた文をどうする？
 function! MyAnnotation()
   let l:line = ant#split_multibyte(getline("."))
   let l:cursor_pos = getpos('.')
@@ -112,6 +112,7 @@ function! MyAnnotation()
         " 検索対象が最上行
         let l:replace = s:begin_tag
           \ . join(l:search_line[l:search_col: ], "")
+
         call setline(search_row, replace)
         break
       endif
