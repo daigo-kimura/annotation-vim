@@ -60,7 +60,7 @@ function! ant#contain_str(list, char)
 endfunction
 
 
-function! MyAnnotation()
+function! ant#annotation()
   let l:line = ant#split_multibyte(getline("."))
   let l:cursor_pos = getpos('.')
 
@@ -190,4 +190,4 @@ function! MyAnnotation()
   endwhile
 endfunction
 
-nnoremap <Leader>f :<C-u>call MyAnnotation()<CR>
+nnoremap <Leader>f :<C-u>call ant#annotation()<CR>

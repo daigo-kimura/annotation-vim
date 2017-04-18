@@ -17,7 +17,7 @@ describe 'Annotation'
 
       normal! 0
       execute 'normal' i . 'l'
-      call MyAnnotation()
+      call ant#annotation()
 
       Expect getline('.') ==#
       \   '<opinion tag="graphic:p,">初めまして。</opinion>'
@@ -34,7 +34,7 @@ describe 'Annotation'
 
       normal! 0
       execute 'normal' (i + 6) . 'l'
-      call MyAnnotation()
+      call ant#annotation()
 
       Expect getline('.') ==#
       \   '初めまして。<opinion tag="graphic:p,">こんにちは。</opinion>いい天気ですね。'
@@ -51,7 +51,7 @@ describe 'Annotation'
 
       normal! 0
       execute 'normal' (i + 1) . 'l'
-      call MyAnnotation()
+      call ant#annotation()
 
       Expect getline('.') ==#
       \   '><opinion tag="graphic:p,">こんにちは</opinion><'
@@ -69,7 +69,7 @@ describe 'Annotation'
 
       normal! 0
       execute 'normal' i . 'l'
-      call MyAnnotation()
+      call ant#annotation()
 
       Expect getline(1) ==#
       \   '初めまして。こんにちは。<opinion tag="graphic:p,">今日は'
@@ -89,7 +89,7 @@ describe 'Annotation'
 
       normal! 0
       execute 'normal' i . 'l'
-      call MyAnnotation()
+      call ant#annotation()
 
       Expect getline(1) ==#
       \   '初めまして。こんにちは><opinion tag="graphic:p,">今日は'
