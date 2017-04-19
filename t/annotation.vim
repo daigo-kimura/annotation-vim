@@ -60,6 +60,29 @@ describe 'Annotation'
     endfor
   end
 
+  it 'annotate single inline sentence ending with(。) in several lines'
+    for i in range(0, 5)
+      execute 'normal!' 'i' . join([
+      \   '初めまして。',
+      \   '初めまして。',
+      \   '初めまして。',
+      \ ], "\<Return>")
+
+      normal! 0k
+      execute 'normal' i . 'l'
+      call ant#annotation()
+
+      Expect getline('1') ==#
+      \   '初めまして。'
+      Expect getline('2') ==#
+      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
+      Expect getline('3') ==#
+      \   '初めまして。'
+
+      normal! uu
+    endfor
+  end
+
   it 'annotate several-lines-sentence ending with(。)'
     for i in range(0, 7)
       execute 'normal!' 'i' . join([

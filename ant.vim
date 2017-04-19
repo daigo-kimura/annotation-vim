@@ -4,7 +4,7 @@
 
 let s:begin_tag = '<opinion tag="graphic:p,">'
 let s:end_tag   = '</opinion>'
-let s:show_log  = 0
+let s:show_log  = 1
 
 
 function! ant#is_multibyte(code)
@@ -74,6 +74,8 @@ function! ant#annotation()
   let l:search_row = l:cursor_pos[1]
   let l:search_col = ant#get_current_col() - 1
   let l:prev_cursor_col = l:search_col + 1
+  let l:in_same_line = 1
+  let l:insert_in_beginning = 0
 
   if s:show_log
     echo "Search preceeding char: "
@@ -91,6 +93,14 @@ function! ant#annotation()
       if ant#contain_str(l:punctuations, l:search_line[l:search_col - 1])
             \|| ant#contain_str(l:guillemets, l:search_line[l:search_col - 1])
         let l:found = 1
+
+        if !l:in_same_line && l:search_col == len(l:search_line)
+          " 上の行の最右列がdelimiterだった場合
+          let l:insert_in_beginning = 1
+          let l:search_row += 1
+          let l:search_col = 1
+          let l:search_line = ant#split_multibyte(getline(l:search_row))
+        endif
         break
       endif
 
@@ -98,19 +108,23 @@ function! ant#annotation()
     endwhile
 
     if l:found
-      let l:replace = join(l:search_line[0: l:search_col - 1], "")
-        \ . s:begin_tag
-        \ . join(l:search_line[l:search_col: ], "")
+      if l:insert_in_beginning
+        let l:replace = s:begin_tag
+          \ . join(l:search_line, "")
+      else
+        let l:replace = join(l:search_line[0: l:search_col - 1], "")
+          \ . s:begin_tag
+          \ . join(l:search_line[l:search_col: ], "")
+      endif
 
-      call setline(search_row, replace)
+      call setline(l:search_row, l:replace)
       break
     else
       if l:search_row == 1
         " 検索対象が最上行
         let l:replace = s:begin_tag
-          \ . join(l:search_line[l:search_col: ], "")
-
-        call setline(search_row, replace)
+          \ . join(l:search_line, "")
+        call setline(l:search_row, l:replace)
         break
       endif
 
@@ -118,6 +132,7 @@ function! ant#annotation()
       let l:search_row -= 1
       let l:search_line = ant#split_multibyte(getline(l:search_row))
       let l:search_col = len(l:search_line)
+      let l:in_same_line = 0
       if s:show_log
         echo 'Move up'
       endif
