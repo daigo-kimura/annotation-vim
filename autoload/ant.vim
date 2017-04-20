@@ -13,9 +13,12 @@ let g:annotation_vim_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:begin_tag  = '<opinion tag="graphic:p,">'
-let s:end_tag    = '</opinion>'
-let g:annotation_vim_show_log   = 0
+let g:annotation_vim_begin_tag   = '<opinion tag="graphic:p,">'
+let g:annotation_vim_end_tag     = '</opinion>'
+let g:annotation_vim_show_log    = 0
+let g:annotation_vim_toggle_manu = 0
+let g:annotation_vim_current_win_nr = bufnr('%')
+let g:annotation_vim_menu_buf_name = -1
 
 
 function! ant#is_multibyte(code)
@@ -62,7 +65,6 @@ endfunction
 """
 function! ant#contain_str(list, char)
   for l:l in a:list
-    " echo 'contain_str: ' . l:l
     if l:l == a:char
       return 1
     endif
@@ -120,11 +122,11 @@ function! ant#annotation()
 
     if l:found
       if l:insert_head
-        let l:replace = s:begin_tag
+        let l:replace = g:annotation_vim_begin_tag
               \ . join(l:search_line, "")
       else
         let l:replace = join(l:search_line[0: l:search_col - 1], "")
-              \ . s:begin_tag
+              \ . g:annotation_vim_begin_tag
               \ . join(l:search_line[l:search_col: ], "")
       endif
 
@@ -134,7 +136,7 @@ function! ant#annotation()
       if l:search_row == 1
             \ || len(ant#split_multibyte(getline(l:search_row - 1))) == 0
         " 検索対象が最上行 || 一つ下の行が空行
-        let l:replace = s:begin_tag
+        let l:replace = g:annotation_vim_begin_tag
               \ . join(l:search_line, "")
         call setline(l:search_row, l:replace)
         break
@@ -212,10 +214,10 @@ function! ant#annotation()
     if l:found
       if l:insert_tail
         let l:replace = join(l:search_line, "")
-              \ . s:end_tag
+              \ . g:annotation_vim_end_tag
       else
         let l:replace = join(l:search_line[0: l:search_col - 1], "")
-              \ . s:end_tag
+              \ . g:annotation_vim_end_tag
               \ . join(l:search_line[l:search_col: ], "")
       endif
 
@@ -226,7 +228,7 @@ function! ant#annotation()
             \ || len(ant#split_multibyte(getline(l:search_row + 1))) == 0
         " 検索対象が最下行 || 検索対象の一つ下の行が空行
         let l:replace = join(l:search_line, "")
-              \ . s:end_tag
+              \ . g:annotation_vim_end_tag
         call setline(l:search_row, l:replace)
         break
       endif
@@ -241,6 +243,20 @@ function! ant#annotation()
       endif
     endif
   endwhile
+endfunction
+
+function! ant#toggle_menu()
+  if g:annotation_vim_toggle_manu
+    return
+  endif
+
+  execute '5new'
+  let g:annotation_vim_menu_buf_name = bufnr('%')
+  " echo g:annotation_vim_current_buf_name
+  " echo g:annotation_vim_menu_buf_name
+  call setline(1, g:annotation_vim_begin_tag . '....SENTENCE....' . g:annotation_vim_end_tag)
+  call setline(3, '')
+  execute "bufwinnr(bufnr(g:annotation_vim_current_buf_name)).'wincmd w'"
 endfunction
 
 let &cpo = s:save_cpo
