@@ -4,12 +4,6 @@
 
 scriptencoding utf-8
 
-if !exists("g:ant#loaded")
-    finish
-endif
-
-let g:ant#loaded = 1
-let s:save_cpo   = &cpo
 
 let s:begin_tag  = '<opinion tag="graphic:p,">'
 let s:end_tag    = '</opinion>'
@@ -213,6 +207,3 @@ function! ant#annotation()
     endif
   endwhile
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo
