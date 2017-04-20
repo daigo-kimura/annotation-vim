@@ -13,7 +13,7 @@ let s:save_cpo   = &cpo
 
 let s:begin_tag  = '<opinion tag="graphic:p,">'
 let s:end_tag    = '</opinion>'
-let s:show_log   = 1
+let s:show_log   = 0
 
 
 function! ant#is_multibyte(code)
