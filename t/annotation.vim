@@ -3,6 +3,8 @@ source plugin/ant.vim
 describe 'This plugin'
   before
     new
+      let g:annotation_vim_begin_tag   = '<opinion tag="graphic:p,">'
+      let g:annotation_vim_end_tag     = '</opinion>'
   end
 
   after
@@ -19,8 +21,8 @@ describe 'This plugin'
       execute 'normal' i . 'l'
       call ant#annotation()
 
-      Expect getline(1) ==#
-      \   '<opinion tag="graphic:p,">初めまして</opinion>'
+      Expect getline(1) ==# g:annotation_vim_begin_tag
+      \ . '初めまして</opinion>'
 
       normal! uu
     endfor
@@ -37,7 +39,9 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline('.') ==#
-      \   '初めまして。<opinion tag="graphic:p,">こんにちは。</opinion>いい天気ですね。'
+      \   '初めまして。'
+      \ . g:annotation_vim_begin_tag
+      \ . 'こんにちは。</opinion>いい天気ですね。'
 
       normal! uu
     endfor
@@ -54,7 +58,9 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline('.') ==#
-      \   '><opinion tag="graphic:p,">こんにちは</opinion><'
+      \   '>'
+      \ . g:annotation_vim_begin_tag
+      \ . 'こんにちは</opinion><'
 
       normal! uu
     endfor
@@ -72,7 +78,9 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
+      \   ''
+      \ . g:annotation_vim_begin_tag
+      \ . '初めまして。</opinion>'
       Expect getline(2) ==#
       \   '初めまして。'
 
@@ -93,11 +101,12 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline('1') ==#
-      \   '初めまして。'
+            \   '初めまして。'
       Expect getline('2') ==#
-      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
+            \ g:annotation_vim_begin_tag
+            \ . '初めまして。</opinion>'
       Expect getline('3') ==#
-      \   '初めまして。'
+            \   '初めまして。'
 
       normal! uu
     endfor
@@ -116,8 +125,8 @@ describe 'This plugin'
 
       Expect getline(1) ==#
       \   '初めまして。'
-      Expect getline(2) ==#
-      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
+      Expect getline(2) ==# g:annotation_vim_begin_tag
+      \ . '初めまして。</opinion>'
 
       normal! uu
     endfor
@@ -135,7 +144,9 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   '初めまして。こんにちは。<opinion tag="graphic:p,">今日は'
+      \   '初めまして。こんにちは。'
+      \ . g:annotation_vim_begin_tag
+      \ . '今日は'
       Expect getline(2) ==#
       \   'いい天気ですね。</opinion>'
 
@@ -156,11 +167,12 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   '<sentence>'
+            \   '<sentence>'
       Expect getline(2) ==#
-      \   '<opinion tag="graphic:p,">初めまして</opinion>'
+            \  g:annotation_vim_begin_tag
+            \ . '初めまして</opinion>'
       Expect getline(3) ==#
-      \   '</sentence>'
+            \   '</sentence>'
 
       normal! uuu
     endfor
@@ -180,9 +192,11 @@ describe 'This plugin'
       Expect getline(1) ==#
       \   ''
       Expect getline(2) ==#
-      \   '<opinion tag="graphic:p,">初めまして</opinion>'
+            \   ''
+            \ . g:annotation_vim_begin_tag
+            \ . '初めまして</opinion>'
       Expect getline(3) ==#
-      \   ''
+            \   ''
 
       normal! uuu
     endfor
@@ -191,18 +205,20 @@ describe 'This plugin'
   it 'annotates several-lines-sentence surronded by(><)'
     for i in range(0, 7)
       execute 'normal!' 'i' . join([
-      \   '初めまして。こんにちは<sentence>今日は',
-      \   'いい天気ですね</sentence>',
-      \ ], "\<Return>")
+            \   '初めまして。こんにちは<sentence>今日は',
+            \   'いい天気ですね</sentence>',
+            \ ], "\<Return>")
 
       normal! 0
       execute 'normal' i . 'l'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   '初めまして。こんにちは<sentence><opinion tag="graphic:p,">今日は'
+            \   '初めまして。こんにちは<sentence>'
+            \ . g:annotation_vim_begin_tag
+            \ . '今日は'
       Expect getline(2) ==#
-      \   'いい天気ですね</opinion></sentence>'
+            \   'いい天気ですね</opinion></sentence>'
 
       normal! uuu
     endfor

@@ -19,7 +19,7 @@ let g:annotation_vim_show_log    = 0
 let g:annotation_vim_toggle_manu = 0
 let g:annotation_vim_current_win_nr = bufnr('%')
 let g:annotation_vim_menu_buf_name = -1
-let g:annotation_vim_initialized = 0
+let g:annotation_vim_config_loaded = 0
 let g:annotation_vim_config_file_name = '.annotation_vim_config'
 
 
@@ -75,18 +75,13 @@ function! ant#contain_str(list, char)
 endfunction
 
 
-function! ant#initialize()
-  if g:annotation_vim_initialized
+function! ant#load_config()
+  if g:annotation_vim_config_loaded
     return
   endif
-  ant#load_config()
-  let g:annotation_vim_initialized = 1
-endfunction
 
-
-function! ant#load_config()
   if !filereadable(g:annotation_vim_config_file_name)
-    let l:config = { 'begin_tag': '<opinion tag="graphic:p,">', 'end_tag'  : '</opinion>' }
+    let l:config = { 'begin_tag': '<opinion tag="graphic:p,">', 'end_tag'  : '</opinion>', }
   else
     let l:config_file = readfile(g:annotation_vim_config_file_name)
     execute 'let l:config=' . l:config_file[0]
@@ -95,10 +90,10 @@ function! ant#load_config()
   if g:annotation_vim_show_log
     echo config
   endif
-  echo config
 
   let g:annotation_vim_begin_tag = config['begin_tag']
   let g:annotation_vim_end_tag = config['end_tag']
+  let g:annotation_vim_config_loaded = 1
 endfunction
 
 
@@ -114,6 +109,7 @@ endfunction
 
 
 function! ant#annotation()
+  call ant#load_config()
   let l:line = ant#split_multibyte(getline("."))
   let l:cursor_pos = getpos('.')
 
