@@ -2,14 +2,18 @@
 " カーソル下の文を<opinion></opinion>で囲む
 """""""""""""""""""""""""""""""""""""""""""
 
+scriptencoding utf-8
+
 if exists("g:ant#loaded")
     finish
 endif
 
-let g:ant#loaded= 1
-let s:begin_tag = '<opinion tag="graphic:p,">'
-let s:end_tag   = '</opinion>'
-let s:show_log  = 1
+let g:ant#loaded = 1
+let s:save_cpo   = &cpo
+
+let s:begin_tag  = '<opinion tag="graphic:p,">'
+let s:end_tag    = '</opinion>'
+let s:show_log   = 1
 
 
 function! ant#is_multibyte(code)
@@ -210,4 +214,5 @@ function! ant#annotation()
   endwhile
 endfunction
 
-nnoremap <Leader>f :<C-u>call ant#annotation()<CR>
+let &cpo = s:save_cpo
+unlet s:save_cpo
