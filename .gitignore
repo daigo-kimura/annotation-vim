@@ -1,3 +1,4 @@
 .vim-flavor/
 VimFlavor.lock
 tmp/
+.annotation_vim_config
