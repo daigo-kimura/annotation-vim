@@ -1,4 +1,4 @@
-source autoload/ant.vim
+source plugin/ant.vim
 
 describe 'My modules'
   it 'can split sentence containing multibyte char'

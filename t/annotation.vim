@@ -1,4 +1,4 @@
-source autoload/ant.vim
+source plugin/ant.vim
 
 describe 'Annotation'
   before

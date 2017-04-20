@@ -7,11 +7,12 @@ scriptencoding utf-8
 if !exists('g:annotation_vim_loaded')
     finish
 endif
+
 let g:annotation_vim_loaded = 1
 
 let s:begin_tag  = '<opinion tag="graphic:p,">'
 let s:end_tag    = '</opinion>'
-let s:show_log   = 0
+let g:annotation_vim_show_log   = 0
 
 
 function! ant#is_multibyte(code)
@@ -84,7 +85,7 @@ function! ant#annotation()
   let l:in_same_line = 1
   let l:insert_in_beginning = 0
 
-  if s:show_log
+  if g:annotation_vim_show_log
     echo "Search preceeding char: "
     echo l:search_line
     echo 'row: ' . l:search_row
@@ -93,7 +94,7 @@ function! ant#annotation()
 
   while !l:found
     while l:search_col >= 1
-      if s:show_log
+      if g:annotation_vim_show_log
         echo 'Searching: ' . l:search_col . ' => ' . l:search_line[l:search_col - 1]
       endif
 
@@ -140,7 +141,7 @@ function! ant#annotation()
       let l:search_line = ant#split_multibyte(getline(l:search_row))
       let l:search_col = len(l:search_line)
       let l:in_same_line = 0
-      if s:show_log
+      if g:annotation_vim_show_log
         echo 'Move up'
       endif
     endif
@@ -151,7 +152,7 @@ function! ant#annotation()
   if l:cursor_pos[1] == l:search_row
     let l:search_col = len(l:search_line) - (len(l:line) - l:prev_cursor_col)
 
-    if s:show_log
+    if g:annotation_vim_show_log
       echo 'Initialize: '
       echo len(l:search_line)
       echo len(l:line)
@@ -162,7 +163,7 @@ function! ant#annotation()
   endif
   let l:search_row = l:cursor_pos[1]
 
-  if s:show_log
+  if g:annotation_vim_show_log
     echo "Search following char: "
     let l:output = []
     for l:i in range(1, len(l:search_line))
@@ -175,7 +176,7 @@ function! ant#annotation()
 
   while !l:found
     while l:search_col <= len(l:search_line)
-      if s:show_log
+      if g:annotation_vim_show_log
         echo 'Searching: ' . l:search_col . ' => ' . l:search_line[l:search_col - 1]
       endif
 
@@ -205,7 +206,7 @@ function! ant#annotation()
       let l:search_row += 1
       let l:search_line = ant#split_multibyte(getline(l:search_row))
       let l:search_col = 1
-      if s:show_log
+      if g:annotation_vim_show_log
         echo 'Move down'
       endif
     endif
