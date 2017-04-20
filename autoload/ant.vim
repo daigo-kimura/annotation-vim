@@ -4,6 +4,10 @@
 
 scriptencoding utf-8
 
+if !exists('g:annotation_vim_loaded')
+    finish
+endif
+let g:annotation_vim_loaded = 1
 
 let s:begin_tag  = '<opinion tag="graphic:p,">'
 let s:end_tag    = '</opinion>'
