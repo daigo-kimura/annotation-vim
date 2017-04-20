@@ -2,6 +2,11 @@
 " カーソル下の文を<opinion></opinion>で囲む
 """""""""""""""""""""""""""""""""""""""""""
 
+if exists("g:ant#loaded")
+    finish
+endif
+
+let g:ant#loaded= 1
 let s:begin_tag = '<opinion tag="graphic:p,">'
 let s:end_tag   = '</opinion>'
 let s:show_log  = 1
