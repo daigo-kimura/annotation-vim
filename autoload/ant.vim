@@ -10,6 +10,9 @@ endif
 
 let g:annotation_vim_loaded = 1
 
+let s:save_cpo = &cpo
+set cpo&vim
+
 let s:begin_tag  = '<opinion tag="graphic:p,">'
 let s:end_tag    = '</opinion>'
 let g:annotation_vim_show_log   = 0
@@ -220,3 +223,6 @@ function! ant#annotation()
     endif
   endwhile
 endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo

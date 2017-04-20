@@ -19,8 +19,8 @@ describe 'This plugin'
       execute 'normal' i . 'l'
       call ant#annotation()
 
-      " Expect getline(1) ==#
-      " \   '<opinion tag="graphic:p,">初めまして</opinion>'
+      Expect getline(1) ==#
+      \   '<opinion tag="graphic:p,">初めまして</opinion>'
 
       normal! uu
     endfor
