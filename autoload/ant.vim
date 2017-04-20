@@ -13,14 +13,17 @@ let g:annotation_vim_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-let g:annotation_vim_begin_tag   = '<opinion tag="graphic:p,">'
-let g:annotation_vim_end_tag     = '</opinion>'
-let g:annotation_vim_show_log    = 0
-let g:annotation_vim_toggle_manu = 0
-let g:annotation_vim_current_win_nr = bufnr('%')
+let g:annotation_vim_begin_tag  = '<opinion tag="graphic:p,">'
+let g:annotation_vim_end_tag = '</opinion>'
+let g:annotation_vim_show_log = 0
+let g:annotation_vim_toggle_menu = 0
+let g:annotation_vim_current_buf_name = bufnr('%')
 let g:annotation_vim_menu_buf_name = -1
+let g:annotation_vim_attributes = ['graphic']
+let g:annotation_vim_config = {}
 let g:annotation_vim_config_loaded = 0
 let g:annotation_vim_config_file_name = '.annotation_vim_config'
+let g:annotation_vim_checkbox_pos = {}
 
 
 function! ant#is_multibyte(code)
@@ -81,18 +84,29 @@ function! ant#load_config()
   endif
 
   if !filereadable(g:annotation_vim_config_file_name)
-    let l:config = { 'begin_tag': '<opinion tag="graphic:p,">', 'end_tag'  : '</opinion>', }
+    let l:tag = { 'begin_tag': '<opinion tag="graphic:p,">', 'end_tag'  : '</opinion>', }
+    let g:annotation_vim_attributes = ['graphic']
   else
     let l:config_file = readfile(g:annotation_vim_config_file_name)
-    execute 'let l:config=' . l:config_file[0]
+    execute 'let l:tag =' . l:config_file[0]
+
+    let g:annotation_vim_attributes = []
+    for l:a in split(l:config_file[1], ',')
+      if l:a != ''
+        let g:annotation_vim_attributes = add(g:annotation_vim_attributes, l:a)
+      endif
+    endfor
   endif
 
   if g:annotation_vim_show_log
-    echo config
+    echo l:tag
   endif
 
-  let g:annotation_vim_begin_tag = config['begin_tag']
-  let g:annotation_vim_end_tag = config['end_tag']
+  let g:annotation_vim_begin_tag = l:tag['begin_tag']
+  let g:annotation_vim_end_tag = l:tag['end_tag']
+
+  call ant#tag_to_config()
+
   let g:annotation_vim_config_loaded = 1
 endfunction
 
@@ -102,9 +116,46 @@ function! ant#store_config()
         \ . g:annotation_vim_begin_tag
         \ . "', 'end_tag': '"
         \ . g:annotation_vim_end_tag
-        \ . "' }"
+        \ . "' }",
+        \ join(g:annotation_vim_attributes, ','),
         \ ]
   call writefile(l:output, g:annotation_vim_config_file_name)
+endfunction
+
+
+function! ant#tag_to_config()
+  let l:value_tag = substitute(g:annotation_vim_begin_tag, '\(^<.\+ tag=\"\|,\">$\)', '', 'g')
+  let l:tag = {}
+  for l:t in split(l:value_tag, ',')
+    let l:tmp = split(l:t, ':')
+    let l:att = l:tmp[0]
+    let l:pol = l:tmp[1]
+    let l:tag[l:att] = l:pol
+  endfor
+
+  for l:att in g:annotation_vim_attributes
+    if !has_key(l:tag, l:att)
+      let g:annotation_vim_config[l:att] = 'x'
+    elseif l:tag[l:att] == 'p'
+      let g:annotation_vim_config[l:att] = 'p'
+    elseif l:tag[l:att] == 'n'
+      let g:annotation_vim_config[l:att] = 'n'
+    else
+      let g:annotation_vim_config[l:att] = '?'
+    endif
+  endfor
+endfunction
+
+
+function! ant#config_to_tag()
+  let g:annotation_vim_begin_tag = '<opinion tag="'
+  for l:att in g:annotation_vim_attributes
+    let g:annotation_vim_begin_tag .= l:att . ':'
+          \ . g:annotation_vim_config[l:att]
+          \ . ','
+  endfor
+  let g:annotation_vim_begin_tag .= '">'
+  echo g:annotation_vim_begin_tag
 endfunction
 
 
@@ -281,18 +332,103 @@ function! ant#annotation()
   endwhile
 endfunction
 
+
+function! ant#update_menu()
+
+  setlocal modifiable
+  call setline(1, g:annotation_vim_begin_tag . '....SENTENCE....' . g:annotation_vim_end_tag)
+  call setline(2, '')
+
+  let l:output = ''
+  let l:count = 0
+  for l:att in g:annotation_vim_attributes
+    let l:o = l:att . '[ '
+          \ .  g:annotation_vim_config[l:att]
+          \ . ' ]  '
+    let l:output .= l:o
+    let g:annotation_vim_checkbox_pos[l:att] = l:count + strlen(l:att) + 1
+    let l:count += strlen(l:o)
+  endfor
+
+  call setline(3, l:output)
+  setlocal nomodifiable
+endfunction
+
+
 function! ant#toggle_menu()
-  if g:annotation_vim_toggle_manu
+  if g:annotation_vim_toggle_menu
     return
   endif
 
   execute '5new'
+
+  setlocal noshowcmd
+  setlocal noswapfile
+  setlocal buftype=nofile
+  setlocal bufhidden=delete
+  setlocal nobuflisted
+  setlocal nowrap
+  setlocal nonumber
+
+
   let g:annotation_vim_menu_buf_name = bufnr('%')
-  " echo g:annotation_vim_current_buf_name
-  " echo g:annotation_vim_menu_buf_name
-  call setline(1, g:annotation_vim_begin_tag . '....SENTENCE....' . g:annotation_vim_end_tag)
-  call setline(3, '')
-  execute "bufwinnr(bufnr(g:annotation_vim_current_buf_name)).'wincmd w'"
+
+  call ant#load_config()
+  call ant#update_menu()
+
+  let l:nr = bufwinnr(g:annotation_vim_current_buf_name)
+  execute l:nr . 'wincmd w'
+  let g:annotation_vim_toggle_menu = 1
+endfunction
+
+
+function! ant#change_polarity(att)
+  if g:annotation_vim_config[a:att] == 'p'
+    let g:annotation_vim_config[a:att] = 'n'
+  elseif g:annotation_vim_config[a:att] == 'n'
+    let g:annotation_vim_config[a:att] = 'x'
+  elseif g:annotation_vim_config[a:att] == 'x'
+    let g:annotation_vim_config[a:att] = 'p'
+  elseif g:annotation_vim_config[a:att] == '?'
+    let g:annotation_vim_config[a:att] = 'p'
+  endif
+endfunction
+
+
+function! ant#check_box()
+  let l:row = getpos('.')[1]
+  let l:col = getpos('.')[2]
+
+  if l:row == 1
+    return
+  endif
+
+  for l:att in g:annotation_vim_attributes
+    if g:annotation_vim_checkbox_pos[l:att] <= l:col
+          \ && l:col <= g:annotation_vim_checkbox_pos[l:att] + 5
+      call ant#change_polarity(l:att)
+      call ant#config_to_tag()
+      call ant#store_config()
+      call ant#update_menu()
+      return
+    endif
+  endfor
+endfunction
+
+
+function! ant#on_click()
+  if !g:annotation_vim_toggle_menu
+    return
+  endif
+
+  if bufnr('%') != g:annotation_vim_menu_buf_name
+    return
+  endif
+
+  call ant#check_box()
+
+  let l:nr = bufwinnr(g:annotation_vim_current_buf_name)
+  execute l:nr . 'wincmd w'
 endfunction
 
 let &cpo = s:save_cpo
