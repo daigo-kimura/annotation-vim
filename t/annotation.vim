@@ -26,46 +26,6 @@ describe 'This plugin'
     endfor
   end
 
-  it 'annotates single inline sentence ending with(。) on top'
-    for i in range(0, 5)
-      execute 'normal!' 'i' . join([
-      \   '初めまして。',
-      \   '初めまして。',
-      \ ], "\<Return>")
-
-      normal! gg0
-      execute 'normal' i . 'l'
-      call ant#annotation()
-
-      Expect getline(1) ==#
-      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
-      Expect getline(2) ==#
-      \   '初めまして。'
-
-      normal! uu
-    endfor
-  end
-
-  it 'annotates single inline sentence ending with(。) on bottom'
-    for i in range(0, 5)
-      execute 'normal!' 'i' . join([
-      \   '初めまして。',
-      \   '初めまして。',
-      \ ], "\<Return>")
-
-      normal! G0
-      execute 'normal' i . 'l'
-      call ant#annotation()
-
-      Expect getline(1) ==#
-      \   '初めまして。'
-      Expect getline(2) ==#
-      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
-
-      normal! uu
-    endfor
-  end
-
   it 'annotates inline sentence ending with(。)'
     for i in range(0, 5)
       execute 'normal!' 'i' . join([
@@ -100,7 +60,27 @@ describe 'This plugin'
     endfor
   end
 
-  it 'annotates single inline sentence ending with(。) in several lines'
+  it 'annotates single inline sentence ending with(。) on top'
+    for i in range(0, 5)
+      execute 'normal!' 'i' . join([
+      \   '初めまして。',
+      \   '初めまして。',
+      \ ], "\<Return>")
+
+      normal! gg0
+      execute 'normal' i . 'l'
+      call ant#annotation()
+
+      Expect getline(1) ==#
+      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
+      Expect getline(2) ==#
+      \   '初めまして。'
+
+      normal! uu
+    endfor
+  end
+
+  it 'annotates single inline sentence ending with(。) in middle'
     for i in range(0, 5)
       execute 'normal!' 'i' . join([
       \   '初めまして。',
@@ -118,6 +98,26 @@ describe 'This plugin'
       \   '<opinion tag="graphic:p,">初めまして。</opinion>'
       Expect getline('3') ==#
       \   '初めまして。'
+
+      normal! uu
+    endfor
+  end
+
+  it 'annotates single inline sentence ending with(。) on bottom'
+    for i in range(0, 5)
+      execute 'normal!' 'i' . join([
+      \   '初めまして。',
+      \   '初めまして。',
+      \ ], "\<Return>")
+
+      normal! G0
+      execute 'normal' i . 'l'
+      call ant#annotation()
+
+      Expect getline(1) ==#
+      \   '初めまして。'
+      Expect getline(2) ==#
+      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
 
       normal! uu
     endfor
@@ -143,11 +143,56 @@ describe 'This plugin'
     endfor
   end
 
+  it 'annotates a sentence preceeding xml tag'
+    for i in range(0, 4)
+      execute 'normal!' 'i' . join([
+      \   '<sentence>',
+      \   '初めまして',
+      \   '</sentence>',
+      \ ], "\<Return>")
+
+      normal! ggj0
+      execute 'normal' i . 'l'
+      call ant#annotation()
+
+      Expect getline(1) ==#
+      \   '<sentence>'
+      Expect getline(2) ==#
+      \   '<opinion tag="graphic:p,">初めまして</opinion>'
+      Expect getline(3) ==#
+      \   '</sentence>'
+
+      normal! uuu
+    endfor
+  end
+
+  it 'annotates a sentence surrounded with blank lines'
+    for i in range(0, 4)
+      execute 'normal!' 'i' . join([
+      \   '',
+      \   '初めまして',
+      \   '',
+      \ ], "\<Return>")
+
+      normal! ggj0
+      execute 'normal' i . 'l'
+      call ant#annotation()
+      Expect getline(1) ==#
+      \   ''
+      Expect getline(2) ==#
+      \   '<opinion tag="graphic:p,">初めまして</opinion>'
+      Expect getline(3) ==#
+      \   ''
+
+      normal! uuu
+    endfor
+  end
+
   it 'annotates several-lines-sentence surronded by(><)'
     for i in range(0, 7)
       execute 'normal!' 'i' . join([
-      \   '初めまして。こんにちは>今日は',
-      \   'いい天気ですね<',
+      \   '初めまして。こんにちは<sentence>今日は',
+      \   'いい天気ですね</sentence>',
       \ ], "\<Return>")
 
       normal! 0
@@ -155,9 +200,9 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   '初めまして。こんにちは><opinion tag="graphic:p,">今日は'
+      \   '初めまして。こんにちは<sentence><opinion tag="graphic:p,">今日は'
       Expect getline(2) ==#
-      \   'いい天気ですね</opinion><'
+      \   'いい天気ですね</opinion></sentence>'
 
       normal! uuu
     endfor

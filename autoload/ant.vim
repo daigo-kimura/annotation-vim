@@ -86,7 +86,7 @@ function! ant#annotation()
   let l:search_col = ant#get_current_col() - 1
   let l:prev_cursor_col = l:search_col + 1
   let l:in_same_line = 1
-  let l:insert_in_beginning = 0
+  let l:insert_head = 0
 
   if g:annotation_vim_show_log
     echo "Search preceeding char: "
@@ -102,12 +102,12 @@ function! ant#annotation()
       endif
 
       if ant#contain_str(l:punctuations, l:search_line[l:search_col - 1])
-            \|| ant#contain_str(l:guillemets, l:search_line[l:search_col - 1])
+            \ || ant#contain_str(l:guillemets, l:search_line[l:search_col - 1])
         let l:found = 1
 
         if !l:in_same_line && l:search_col == len(l:search_line)
           " 上の行の最右列がdelimiterだった場合
-          let l:insert_in_beginning = 1
+          let l:insert_head = 1
           let l:search_row += 1
           let l:search_col = 1
           let l:search_line = ant#split_multibyte(getline(l:search_row))
@@ -119,22 +119,23 @@ function! ant#annotation()
     endwhile
 
     if l:found
-      if l:insert_in_beginning
+      if l:insert_head
         let l:replace = s:begin_tag
-          \ . join(l:search_line, "")
+              \ . join(l:search_line, "")
       else
         let l:replace = join(l:search_line[0: l:search_col - 1], "")
-          \ . s:begin_tag
-          \ . join(l:search_line[l:search_col: ], "")
+              \ . s:begin_tag
+              \ . join(l:search_line[l:search_col: ], "")
       endif
 
       call setline(l:search_row, l:replace)
       break
     else
       if l:search_row == 1
-        " 検索対象が最上行
+            \ || len(ant#split_multibyte(getline(l:search_row - 1))) == 0
+        " 検索対象が最上行 || 一つ下の行が空行
         let l:replace = s:begin_tag
-          \ . join(l:search_line, "")
+              \ . join(l:search_line, "")
         call setline(l:search_row, l:replace)
         break
       endif
@@ -151,6 +152,9 @@ function! ant#annotation()
   endwhile
 
   let l:found = 0
+  let l:insert_tail = 0
+  let l:in_same_line = 1
+  let l:buf_line_len = len(getline(0, '$'))
   let l:search_line = ant#split_multibyte(getline("."))
   if l:cursor_pos[1] == l:search_row
     let l:search_col = len(l:search_line) - (len(l:line) - l:prev_cursor_col)
@@ -191,6 +195,14 @@ function! ant#annotation()
       if ant#contain_str(l:guillemets, l:search_line[l:search_col - 1])
         let l:found = 1
         let l:search_col -= 1
+
+        if !l:in_same_line && l:search_col == 0
+          " 下の行の最左列がguillemetsだった場合
+          let l:insert_tail = 1
+          let l:search_row -= 1
+          let l:search_line = ant#split_multibyte(getline(l:search_row))
+          let l:search_col = len(l:search_line)
+        endif
         break
       endif
 
@@ -198,17 +210,23 @@ function! ant#annotation()
     endwhile
 
     if l:found
-      let l:replace = join(l:search_line[0: l:search_col - 1], "")
-            \ . s:end_tag
-            \ . join(l:search_line[l:search_col: ], "")
+      if l:insert_tail
+        let l:replace = join(l:search_line, "")
+              \ . s:end_tag
+      else
+        let l:replace = join(l:search_line[0: l:search_col - 1], "")
+              \ . s:end_tag
+              \ . join(l:search_line[l:search_col: ], "")
+      endif
 
       call setline(search_row, replace)
       break
     else
-      if l:search_row == 1
-        " 検索対象が最下行
+      if l:search_row == buf_line_len
+            \ || len(ant#split_multibyte(getline(l:search_row + 1))) == 0
+        " 検索対象が最下行 || 検索対象の一つ下の行が空行
         let l:replace = join(l:search_line, "")
-          \ . s:end_tag
+              \ . s:end_tag
         call setline(l:search_row, l:replace)
         break
       endif
@@ -217,6 +235,7 @@ function! ant#annotation()
       let l:search_row += 1
       let l:search_line = ant#split_multibyte(getline(l:search_row))
       let l:search_col = 1
+      let l:in_same_line = 0
       if g:annotation_vim_show_log
         echo 'Move down'
       endif
