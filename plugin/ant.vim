@@ -9,4 +9,4 @@ if exists('g:annotation_vim_loaded')
 endif
 let g:annotation_vim_loaded = 1
 
-nnoremap <Leader>f :<C-u>call ant#annotation()<CR>
+nnoremap <silent> <Leader>f :<C-u>call ant#annotation()<CR>
