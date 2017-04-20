@@ -202,7 +202,15 @@ function! ant#annotation()
       call setline(search_row, replace)
       break
     else
-      " 検索対象を上の行に
+      if l:search_row == 1
+        " 検索対象が最下行
+        let l:replace = join(l:search_line, "")
+          \ . s:end_tag
+        call setline(l:search_row, l:replace)
+        break
+      endif
+
+      " 検索対象を下の行に
       let l:search_row += 1
       let l:search_line = ant#split_multibyte(getline(l:search_row))
       let l:search_col = 1

@@ -1,6 +1,6 @@
 source plugin/ant.vim
 
-describe 'Annotation'
+describe 'This plugin'
   before
     new
   end
@@ -9,24 +9,64 @@ describe 'Annotation'
     close!
   end
 
-  it 'annotate single inline sentence ending with(。)'
+  it 'annotates line'
     for i in range(0, 5)
       execute 'normal!' 'i' . join([
-      \   '初めまして。',
+      \   '初めまして',
       \ ], "\<Return>")
 
-      normal! 0
+      normal! gg0
       execute 'normal' i . 'l'
       call ant#annotation()
 
-      Expect getline('.') ==#
+      " Expect getline(1) ==#
+      " \   '<opinion tag="graphic:p,">初めまして</opinion>'
+
+      normal! uu
+    endfor
+  end
+
+  it 'annotates single inline sentence ending with(。) on top'
+    for i in range(0, 5)
+      execute 'normal!' 'i' . join([
+      \   '初めまして。',
+      \   '初めまして。',
+      \ ], "\<Return>")
+
+      normal! gg0
+      execute 'normal' i . 'l'
+      call ant#annotation()
+
+      Expect getline(1) ==#
+      \   '<opinion tag="graphic:p,">初めまして。</opinion>'
+      Expect getline(2) ==#
+      \   '初めまして。'
+
+      normal! uu
+    endfor
+  end
+
+  it 'annotates single inline sentence ending with(。) on bottom'
+    for i in range(0, 5)
+      execute 'normal!' 'i' . join([
+      \   '初めまして。',
+      \   '初めまして。',
+      \ ], "\<Return>")
+
+      normal! G0
+      execute 'normal' i . 'l'
+      call ant#annotation()
+
+      Expect getline(1) ==#
+      \   '初めまして。'
+      Expect getline(2) ==#
       \   '<opinion tag="graphic:p,">初めまして。</opinion>'
 
       normal! uu
     endfor
   end
 
-  it 'annotate inline sentence ending with(。)'
+  it 'annotates inline sentence ending with(。)'
     for i in range(0, 5)
       execute 'normal!' 'i' . join([
       \   '初めまして。こんにちは。いい天気ですね。',
@@ -43,7 +83,7 @@ describe 'Annotation'
     endfor
   end
 
-  it 'annotate inline sentence guillemet'
+  it 'annotates inline sentence guillemet'
     for i in range(0, 4)
       execute 'normal!' 'i' . join([
       \   '>こんにちは<',
@@ -60,7 +100,7 @@ describe 'Annotation'
     endfor
   end
 
-  it 'annotate single inline sentence ending with(。) in several lines'
+  it 'annotates single inline sentence ending with(。) in several lines'
     for i in range(0, 5)
       execute 'normal!' 'i' . join([
       \   '初めまして。',
@@ -83,7 +123,7 @@ describe 'Annotation'
     endfor
   end
 
-  it 'annotate several-lines-sentence ending with(。)'
+  it 'annotates several-lines-sentence ending with(。)'
     for i in range(0, 7)
       execute 'normal!' 'i' . join([
       \   '初めまして。こんにちは。今日は',
@@ -103,7 +143,7 @@ describe 'Annotation'
     endfor
   end
 
-  it 'annotate several-lines-sentence surronded by(><)'
+  it 'annotates several-lines-sentence surronded by(><)'
     for i in range(0, 7)
       execute 'normal!' 'i' . join([
       \   '初めまして。こんにちは>今日は',
