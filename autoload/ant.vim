@@ -4,7 +4,7 @@
 
 scriptencoding utf-8
 
-if exists("g:ant#loaded")
+if !exists("g:ant#loaded")
     finish
 endif
 
