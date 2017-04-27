@@ -21,9 +21,10 @@ describe 'This plugin'
       execute 'normal' i . 'l'
       call ant#annotation()
 
-      Expect getline(1) ==# g:annotation_vim_begin_tag
-      \ . '初めまして'
-      \ . g:annotation_vim_end_tag
+      Expect getline(1) ==#
+            \ g:annotation_vim_begin_tag
+            \ . '初めまして'
+            \ . g:annotation_vim_end_tag
 
       normal! uu
     endfor
@@ -40,11 +41,11 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline('.') ==#
-      \   '初めまして。'
-      \ . g:annotation_vim_begin_tag
-      \ . 'こんにちは。'
-      \ . g:annotation_vim_end_tag
-      \ . 'いい天気ですね。'
+            \ '初めまして。'
+            \ . g:annotation_vim_begin_tag
+            \ . 'こんにちは。'
+            \ . g:annotation_vim_end_tag
+            \ . 'いい天気ですね。'
 
       normal! uu
     endfor
@@ -61,11 +62,11 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline('.') ==#
-      \   '>'
-      \ . g:annotation_vim_begin_tag
-      \ . 'こんにちは'
-      \ . g:annotation_vim_end_tag
-      \ . '<'
+            \   '>'
+            \ . g:annotation_vim_begin_tag
+            \ . 'こんにちは'
+            \ . g:annotation_vim_end_tag
+            \ . '<'
 
       normal! uu
     endfor
@@ -83,13 +84,12 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   ''
-      \ . g:annotation_vim_begin_tag
-      \ . '初めまして。'
-      \ . g:annotation_vim_end_tag
+            \ . g:annotation_vim_begin_tag
+            \ . '初めまして。'
+            \ . g:annotation_vim_end_tag
 
       Expect getline(2) ==#
-      \   '初めまして。'
+            \ '初めまして。'
 
       normal! uu
     endfor
@@ -108,7 +108,7 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline('1') ==#
-            \   '初めまして。'
+            \ '初めまして。'
       Expect getline('2') ==#
             \ g:annotation_vim_begin_tag
             \ . '初めまして。'
@@ -133,10 +133,10 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   '初めまして。'
+            \ '初めまして。'
       Expect getline(2) ==# g:annotation_vim_begin_tag
-      \ . '初めまして。'
-      \ . g:annotation_vim_end_tag
+            \ . '初めまして。'
+            \ . g:annotation_vim_end_tag
 
       normal! uu
     endfor
@@ -154,12 +154,12 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-      \   '初めまして。こんにちは。'
-      \ . g:annotation_vim_begin_tag
-      \ . '今日は'
+            \ '初めまして。こんにちは。'
+            \ . g:annotation_vim_begin_tag
+            \ . '今日は'
       Expect getline(2) ==#
-      \   'いい天気ですね。'
-      \ . g:annotation_vim_end_tag
+            \ 'いい天気ですね。'
+            \ . g:annotation_vim_end_tag
 
       normal! uuu
     endfor
@@ -205,7 +205,6 @@ describe 'This plugin'
       Expect getline(1) ==#
       \   ''
       Expect getline(2) ==#
-            \   ''
             \ . g:annotation_vim_begin_tag
             \ . '初めまして'
             \ . g:annotation_vim_end_tag
