@@ -84,7 +84,7 @@ describe 'This plugin'
       call ant#annotation()
 
       Expect getline(1) ==#
-            \ . g:annotation_vim_begin_tag
+            \ g:annotation_vim_begin_tag
             \ . '初めまして。'
             \ . g:annotation_vim_end_tag
 
@@ -205,7 +205,7 @@ describe 'This plugin'
       Expect getline(1) ==#
       \   ''
       Expect getline(2) ==#
-            \ . g:annotation_vim_begin_tag
+            \ g:annotation_vim_begin_tag
             \ . '初めまして'
             \ . g:annotation_vim_end_tag
 
