@@ -1,5 +1,5 @@
 .vim-flavor/
 VimFlavor.lock
 tmp/
+.session/
 .annotation_vim_config
-Session.vim
