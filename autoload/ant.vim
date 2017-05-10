@@ -82,12 +82,13 @@ function! ant#load_config()
   if g:annotation_vim_config_loaded
     return
   endif
+  let l:config_file_path = g:annotation_vim_config_file_dir . g:annotation_vim_config_file_name
 
-  if !filereadable(g:annotation_vim_config_file_name)
+  if !filereadable(l:config_file_path)
     let l:tag = { 'begin_tag': '<opinion tag="graphic:p,">', 'end_tag'  : '</opinion>', }
     let g:annotation_vim_attributes = ['graphic']
   else
-    let l:config_file = readfile(g:annotation_vim_config_file_name)
+    let l:config_file = readfile(l:config_file_path)
     execute 'let l:tag =' . l:config_file[0]
 
     let g:annotation_vim_attributes = []
@@ -119,7 +120,8 @@ function! ant#store_config()
         \ . "' }",
         \ join(g:annotation_vim_attributes, ','),
         \ ]
-  call writefile(l:output, g:annotation_vim_config_file_name)
+  let l:config_file_path = g:annotation_vim_config_file_dir . g:annotation_vim_config_file_name
+  call writefile(l:output, l:config_file_path)
 endfunction
 
 
