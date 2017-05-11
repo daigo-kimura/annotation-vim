@@ -5,7 +5,7 @@
 scriptencoding utf-8
 
 if !exists('g:annotation_vim_loaded')
-    finish
+r finish
 endif
 
 let g:annotation_vim_loaded = 1
@@ -16,7 +16,6 @@ set cpo&vim
 let g:annotation_vim_begin_tag  = '<opinion tag="graphic:p,">'
 let g:annotation_vim_end_tag = '</opinion>'
 let g:annotation_vim_show_log = 0
-let g:annotation_vim_toggle_menu = 0
 let g:annotation_vim_current_buf_name = bufnr('%')
 let g:annotation_vim_menu_buf_name = -1
 let g:annotation_vim_attributes = ['graphic']
@@ -136,7 +135,7 @@ function! ant#tag_to_config()
   endfor
 
   for l:att in g:annotation_vim_attributes
-    if !has_key(l:tag, l:att)
+    if !has_key(l:tag, l:att) || l:tag[l:att] == 'x'
       let g:annotation_vim_config[l:att] = 'x'
     elseif l:tag[l:att] == 'p'
       let g:annotation_vim_config[l:att] = 'p'
@@ -358,7 +357,11 @@ endfunction
 
 
 function! ant#toggle_menu()
-  if g:annotation_vim_toggle_menu
+  if bufexists(g:annotation_vim_menu_buf_name)
+    let l:nr = bufwinnr(g:annotation_vim_menu_buf_name)
+    execute l:nr . 'wincmd w'
+    execute 'q'
+    let g:annotation_vim_menu_buf_name = -1
     return
   endif
 
@@ -371,7 +374,8 @@ function! ant#toggle_menu()
   setlocal nobuflisted
   setlocal nowrap
   setlocal nonumber
-
+  map <buffer> <silent> <2-LeftMouse> <LeftMouse>
+  map <buffer> <silent> <3-LeftMouse> <LeftMouse>
 
   let g:annotation_vim_menu_buf_name = bufnr('%')
 
@@ -380,7 +384,6 @@ function! ant#toggle_menu()
 
   let l:nr = bufwinnr(g:annotation_vim_current_buf_name)
   execute l:nr . 'wincmd w'
-  let g:annotation_vim_toggle_menu = 1
 endfunction
 
 
@@ -419,11 +422,11 @@ endfunction
 
 
 function! ant#on_click()
-  if !g:annotation_vim_toggle_menu
+  if bufnr('%') != g:annotation_vim_menu_buf_name
     return
   endif
 
-  if bufnr('%') != g:annotation_vim_menu_buf_name
+  if g:annotation_vim_menu_buf_name == -1
     return
   endif
 

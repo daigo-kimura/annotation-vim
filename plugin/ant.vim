@@ -16,6 +16,7 @@ let g:annotation_vim_show_log = 0
 let g:annotation_vim_config_file_dir = expand('~/.config/')
 
 nnoremap <silent> <Leader>f :<C-u>call ant#annotation()<CR>
+nnoremap <silent> <Leader>1 :<C-u>call ant#toggle_menu()<CR>
 noremap <silent> <LeftMouse> <LeftMouse>:<C-u>call ant#on_click()<CR>
 
 let &cpo = s:save_cpo
