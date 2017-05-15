@@ -11,7 +11,7 @@ describe 'This plugin'
     close!
   end
 
-  it 'annotates line'
+  it 'annotates a sentence'
     for i in range(0, 5)
       execute 'normal!' 'i' . join([
       \   '初めまして',
@@ -30,7 +30,7 @@ describe 'This plugin'
     endfor
   end
 
-  it 'annotates inline sentence ending with(。)'
+  it 'annotates an inline sentence ending with(。)'
     for i in range(0, 5)
       execute 'normal!' 'i' . join([
       \   '初めまして。こんにちは。いい天気ですね。',
@@ -51,7 +51,7 @@ describe 'This plugin'
     endfor
   end
 
-  it 'annotates inline sentence guillemet'
+  it 'annotates an inline sentence surronded(><)'
     for i in range(0, 4)
       execute 'normal!' 'i' . join([
       \   '>こんにちは<',
@@ -216,7 +216,7 @@ describe 'This plugin'
     endfor
   end
 
-  it 'annotates several-lines-sentence surronded by(><)'
+  it 'annotates a several-lines-sentence surronded by(><)'
     for i in range(0, 7)
       execute 'normal!' 'i' . join([
             \   '初めまして。こんにちは<sentence>今日は',
