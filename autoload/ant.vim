@@ -5,7 +5,7 @@
 scriptencoding utf-8
 
 if !exists('g:annotation_vim_loaded')
-r finish
+  finish
 endif
 
 let g:annotation_vim_loaded = 1
