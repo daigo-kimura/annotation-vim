@@ -25,6 +25,9 @@ let g:annotation_vim_config_file_name = '.annotation_vim_config'
 let g:annotation_vim_checkbox_pos = {}
 
 
+"""
+" Check if a:code is multibyte character
+"""
 function! ant#is_multibyte(code)
   if a:code < 128
     return 0
@@ -34,11 +37,17 @@ function! ant#is_multibyte(code)
 endfunction
 
 
+"""
+" Split string containing multibyte character
+"""
 function! ant#split_multibyte(sentence)
   return split(a:sentence, '\zs')
 endfunction
 
 
+"""
+" Return cursor columns
+"""
 function! ant#get_current_col()
   let l:line = ant#split_multibyte(getline("."))
   let l:n_byte = 1
@@ -77,6 +86,9 @@ function! ant#contain_str(list, char)
 endfunction
 
 
+"""
+" Load config from a file
+"""
 function! ant#load_config()
   if g:annotation_vim_config_loaded
     return
@@ -110,7 +122,9 @@ function! ant#load_config()
   let g:annotation_vim_config_loaded = 1
 endfunction
 
-
+"""
+" Store config to a file
+"""
 function! ant#store_config()
   let l:output = ["{ 'begin_tag': '"
         \ . g:annotation_vim_begin_tag
@@ -124,6 +138,9 @@ function! ant#store_config()
 endfunction
 
 
+"""
+" Read tag and store to config
+"""
 function! ant#tag_to_config()
   let l:value_tag = substitute(g:annotation_vim_begin_tag, '\(^<.\+ tag=\"\|,\">$\)', '', 'g')
   let l:tag = {}
@@ -148,6 +165,9 @@ function! ant#tag_to_config()
 endfunction
 
 
+"""
+" Load config and update tag
+"""
 function! ant#config_to_tag()
   let g:annotation_vim_begin_tag = '<opinion tag="'
   for l:att in g:annotation_vim_attributes
@@ -160,6 +180,9 @@ function! ant#config_to_tag()
 endfunction
 
 
+"""
+" Annotate a sentence
+"""
 function! ant#annotation()
   call ant#load_config()
   let l:line = ant#split_multibyte(getline("."))
@@ -334,8 +357,10 @@ function! ant#annotation()
 endfunction
 
 
+"""
+" Update description on menu
+"""
 function! ant#update_menu()
-
   setlocal modifiable
   call setline(1, g:annotation_vim_begin_tag . '....SENTENCE....' . g:annotation_vim_end_tag)
   call setline(2, '')
@@ -356,12 +381,19 @@ function! ant#update_menu()
 endfunction
 
 
+"""
+" Toggle menu buffer only if it does not exist
+"""
 function! ant#toggle_menu()
   if bufexists(g:annotation_vim_menu_buf_name)
     let l:nr = bufwinnr(g:annotation_vim_menu_buf_name)
     execute l:nr . 'wincmd w'
     execute 'q'
     let g:annotation_vim_menu_buf_name = -1
+
+    augroup annotation_vim
+      autocmd!
+    augroup END
     return
   endif
 
@@ -370,7 +402,7 @@ function! ant#toggle_menu()
   setlocal noshowcmd
   setlocal noswapfile
   setlocal buftype=nofile
-  setlocal bufhidden=delete
+  setlocal bufhidden=wipe
   setlocal nobuflisted
   setlocal nowrap
   setlocal nonumber
@@ -384,6 +416,27 @@ function! ant#toggle_menu()
 
   let l:nr = bufwinnr(g:annotation_vim_current_buf_name)
   execute l:nr . 'wincmd w'
+
+  augroup annotation_vim
+    autocmd!
+    autocmd BufDelete * call ant#close_menu()
+  augroup END
+
+  echo 'Call toggle menu'
+endfunction
+
+
+"""
+" Close menu buffer
+"""
+function! ant#close_menu()
+  echo 'Call close_menu'
+  if g:annotation_vim_menu_buf_name == -1
+    echoerr 'Menu buffer does not exist!'
+    return
+  endif
+
+  execute ':bdelete ' . g:annotation_vim_menu_buf_name
 endfunction
 
 
@@ -400,6 +453,9 @@ function! ant#change_polarity(att)
 endfunction
 
 
+"""
+" Called when checkbox is clicked
+"""
 function! ant#check_box()
   let l:row = getpos('.')[1]
   let l:col = getpos('.')[2]
@@ -421,6 +477,9 @@ function! ant#check_box()
 endfunction
 
 
+"""
+" Click event
+"""
 function! ant#on_click()
   if bufnr('%') != g:annotation_vim_menu_buf_name
     return
