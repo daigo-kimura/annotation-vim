@@ -96,6 +96,7 @@ function! ant#load_config()
   let l:config_file_path = g:annotation_vim_config_file_dir . g:annotation_vim_config_file_name
 
   if !filereadable(l:config_file_path)
+    " No config file
     let l:tag = { 'begin_tag': '<opinion tag="graphic:p,">', 'end_tag'  : '</opinion>', }
     let g:annotation_vim_attributes = ['graphic']
   else
@@ -103,11 +104,15 @@ function! ant#load_config()
     execute 'let l:tag =' . l:config_file[0]
 
     let g:annotation_vim_attributes = []
-    for l:a in split(l:config_file[1], ',')
-      if l:a != ''
-        let g:annotation_vim_attributes = add(g:annotation_vim_attributes, l:a)
-      endif
-    endfor
+    if len(l:config_file) == 1
+    else
+      " If tag contain polarity
+      for l:a in split(l:config_file[1], ',')
+        if l:a != ''
+          let g:annotation_vim_attributes = add(g:annotation_vim_attributes, l:a)
+        endif
+      endfor
+    endif
   endif
 
   if g:annotation_vim_show_log
@@ -147,8 +152,11 @@ function! ant#tag_to_config()
   for l:t in split(l:value_tag, ',')
     let l:tmp = split(l:t, ':')
     let l:att = l:tmp[0]
-    let l:pol = l:tmp[1]
-    let l:tag[l:att] = l:pol
+    if len(tmp) == 2
+      " If tag contain polarity
+      let l:pol = l:tmp[1]
+      let l:tag[l:att] = l:pol
+    endif
   endfor
 
   for l:att in g:annotation_vim_attributes
